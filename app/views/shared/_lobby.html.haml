@@ -1,0 +1,12 @@
+.lobby
+  .lobby_player
+    .lobby_player--first
+    .lobby_player--second
+  .lobby__field
+    .lobby__name
+      = current_user.lobby.try(:name) || current_user.guest_lobby.name
+    .lobby__timer
+    %ul.lobby__figures
+  .lobby__history
+  .lobby__control-panel
+    = link_to("Leave lobby", lobby_path(lobby.id), method: :delete)
