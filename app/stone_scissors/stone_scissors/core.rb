@@ -10,26 +10,6 @@ module StoneScissors
       "spok" => :spok
     }
 
-    # def self.figures
-    #   ["stone", "lizard", "scissors", "paper", "spok"]
-    # end
-
-    # def start
-    #   if timer
-    #     with_timer { rolls }
-    #   else
-    #     rolls
-    #   end
-    # end
-    #
-    # def rolls(first_player)
-    #   wait_roll(player)
-    # end
-
-    # def next_player
-    #   @current_plyer =  if @current_plyer == player1 : player2 : player1
-    # end
-
     attr_reader :palyer1, :player2, :timer, :max_score
     attr_accessor :p1_score, :p2_score
 
@@ -75,8 +55,8 @@ module StoneScissors
       message = {
         "game" => "win",
         "win_figure" => result,
-        "#{player1.name}" => {"figure" => player1.roll, "score" => p1_score},
-        "#{player2.name}" => {"figure" => player2.roll, "score" => p2_score}
+        "#{player1.user.name}" => {"figure" => player1.roll, "score" => p1_score},
+        "#{player2.user.name}" => {"figure" => player2.roll, "score" => p2_score}
       }
       clean_figure
       send_message(message)
@@ -90,8 +70,8 @@ module StoneScissors
         p2_score += 1 if p2_roll
         message = {
           "game" => "timeout",
-          "#{player1.name}" => {"score" => p1_score, "figure" => p1_roll},
-          "#{player2.name}" => {"score" => p2_score, "figure" => p2_roll}
+          "#{player1.user.name}" => {"score" => p1_score, "figure" => p1_roll},
+          "#{player2.user.name}" => {"score" => p2_score, "figure" => p2_roll}
         }
         clean_figure
         send_message(message)
@@ -113,15 +93,15 @@ module StoneScissors
       end
     end
 
-    def send_hint(user)
-      competitor = user == player1 ? player2 : player1
+    def send_hint(player)
+      competitor = player == player1 ? player2 : player1
       hint = Game::Figures.values - [competitor.roll] if competitor.roll
       message = {
         "game" => "hint",
-        "player" => "#{user.name}",
+        "player" => "#{player.user.name}",
         "figure" => (hint ? [hint, competitor.roll].shuffle : ["none"])
       }
-      user.ws.send(message)
+      Player.find_player(player.user.name).ws.send(message) # дооооделать
     end
 
     def best_score

@@ -3,30 +3,24 @@ module StoneScissors
 
     class << self
 
-      # def players
-      #   @players ||= []
-      # end
-
       def find_player(plyer_name)
-        Connection.connected.find{|c| c.user.name == player2_name}
+        Connection.connected.find{|c| c.player.user.name == player2_name}
       end
     end
 
-    attr_reader :roll, :hint
+    attr_reader :roll, :hint, :user 
 
     def initialize(user)
       @hint = false
-      # Player.players << self
     end
 
-    def roll(figure)
+    def choose_figure!(figure)
       @figure = Game::Figures[figure]
     end
 
     def get_hint
       @hint = true if @hint == "used"
     end
-
 
     protected
 

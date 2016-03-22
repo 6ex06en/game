@@ -1,3 +1,5 @@
+require_relative "player"
+
 module StoneScissors
   class Connection
 
@@ -9,11 +11,11 @@ module StoneScissors
 
     end
 
-    attr_reader :ws, :user
+    attr_reader :ws, :player
 
     def initialize(ws, user)
       @ws = ws
-      @user = Player.new(user)
+      @player ||= Player.new(user)
       Connection.connected << self
     end
 

@@ -1,13 +1,13 @@
-# require_relative "stone_scissors_paper/connection.rb"
-# require_relative "stone_scissors_paper/core.rb"
-# require_relative "stone_scissors_paper/player.rb"
+require_relative "stone_scissors/connection"
+require_relative "stone_scissors/core"
+require_relative "stone_scissors/player"
 
 module StoneScissors
 
   class << self
 
-    def add_user(user)
-      Player.new(user)
+    def add_user(ws, user)
+      Connection.new(ws, user)
     end
 
     def new_game(player1_name, player2_name)
