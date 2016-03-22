@@ -1,12 +1,20 @@
 .lobby
   .lobby_player
     .lobby_player--first
+      = lobby.user.name
     .lobby_player--second
+      = lobby.guest.try(:name)
   .lobby__field
     .lobby__name
       = current_user.lobby.try(:name) || current_user.guest_lobby.name
     .lobby__timer
     %ul.lobby__figures
-  .lobby__history
+      %li{data: {figure: "rock"}} Rock
+      %li{data: {figure: "scissors"}} Scissors
+      %li{data: {figure: "paper"}} Paper
+      %li{data: {figure: "lizard"}} Lizard
+      %li{data: {figure: "spok"}} Spok
+  .lobby__history History
   .lobby__control-panel
-    = link_to("Leave lobby", lobby_path(lobby.id), method: :delete)
+    = button_to("Start", '#', disabled: true)
+    = button_to("Leave lobby", lobby_path(lobby.id), method: :delete)

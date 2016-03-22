@@ -1,6 +1,7 @@
 class MainController < ApplicationController
 
   def index
+    @lobbies = Lobby.all
   end
 
   def ws

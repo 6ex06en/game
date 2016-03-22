@@ -1,7 +1,7 @@
 class LobbiesController < ApplicationController
   before_action :signed_in?
-  before_action ->(options = :unneeded){with_lobby?(options)}, only: [:new]
-  before_action :with_lobby?, except: [:new]
+  before_action ->(options = :unneeded){with_lobby?(options)}, only: [:new, :create]
+  before_action :with_lobby?, except: [:new, :create]
 
   def new
     @lobby = current_user.build_lobby

@@ -7,3 +7,62 @@
   width: 400px;
   height: 300px;
 }
+
+.lobby_player {
+  display: inline-block;
+  width: 30%;
+  height: 80%;
+  float: left;
+}
+.lobby_player--first, .lobby_player--second {
+  display: inherit;
+  float: left;
+  width: calc(50% - 1px);
+  height: 100%;
+  text-align: center;
+  border-right: 1px solid black;
+}
+
+.lobby__field {
+  display: inline-block;
+  width: 50%;
+  float: left;
+
+  .lobby__name {
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+  }
+  .lobby__timer {
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+  }
+}
+
+.lobby__figures {
+  padding: 10px;
+  list-style: none;
+  li:hover {
+    color: white;
+    cursor: pointer;
+  }
+}
+.lobby__history {
+  display: inline-block;
+  width: calc(20% - 1px);
+  height: 80%;
+  float: left;
+  text-align: center;
+  border-left: 1px solid black;
+}
+.lobby__control-panel {
+  display: inline-block;
+  width: 100%;
+  height: 20%;
+  border-top: 1px solid black;
+}
+
+.lobbies__list {
+  display: inline-block;
+}
