@@ -24,19 +24,24 @@ module StoneScissors
       wait_roll
     end
 
-    def wait_roll(player)
+    def wait_roll
       Thread.new do
+        p "Strt_thread"
         until best_score == max_score
           begin
-            Timeout.timeout(timer) do
+            p "#{best_score} - best_score"
+            #Timeout.timeout(timer) do
               loop do
+                p "start_loop"
+                sleep 1
                 [player1, player2].each do |p|
-                  send_hint(p); p.off_hint if p.hint === true
+                  send_hint(p); p.off_hint if p.hint
                 end
                 break if player1.roll && player2.roll
               end
-            end
+            #end
           rescue Timeout::Error
+            p "Trigger timeout"
             p1_roll = player1.role.dup #игнорировать изменение переменных,
             p2_roll = player2.role.dup #если присваивание произойдет после таймаута
             time_expired(p1_roll, p2_roll)
@@ -55,8 +60,8 @@ module StoneScissors
       message = {
         "game" => "win",
         "win_figure" => result,
-        "#{player1.user.name}" => {"figure" => player1.roll, "score" => p1_score},
-        "#{player2.user.name}" => {"figure" => player2.roll, "score" => p2_score}
+        "#{player1.id}" => {"figure" => player1.roll, "score" => p1_score},
+        "#{player2.id}" => {"figure" => player2.roll, "score" => p2_score}
       }
       clean_figure
       send_message(message)
@@ -70,8 +75,8 @@ module StoneScissors
         p2_score += 1 if p2_roll
         message = {
           "game" => "timeout",
-          "#{player1.user.name}" => {"score" => p1_score, "figure" => p1_roll},
-          "#{player2.user.name}" => {"score" => p2_score, "figure" => p2_roll}
+          "#{player1.id}" => {"score" => p1_score, "figure" => p1_roll},
+          "#{player2.id}" => {"score" => p2_score, "figure" => p2_roll}
         }
         clean_figure
         send_message(message)
@@ -98,10 +103,10 @@ module StoneScissors
       hint = Game::Figures.values - [competitor.roll] if competitor.roll
       message = {
         "game" => "hint",
-        "player" => "#{player.user.name}",
-        "figure" => (hint ? [hint, competitor.roll].shuffle : ["none"])
+        "player" => player.id,
+        "figure" => (hint ? [hint.sample, competitor.roll].shuffle : ["none"])
       }
-      Player.find_player(player.user.name).ws.send(message) # дооооделать
+      Connection.find_by_player_id(player.id).ws.send(message)
     end
 
     def best_score
