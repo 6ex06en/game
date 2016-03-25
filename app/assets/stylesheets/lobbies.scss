@@ -6,6 +6,7 @@
   border: 1px solid black;
   width: 400px;
   height: 300px;
+  float: left;
 }
 
 .lobby_player {
@@ -65,4 +66,24 @@
 
 .lobbies__list {
   display: inline-block;
+  float: left;
+  margin-right: 20px;
+  
+  ul {
+    margin: 0 auto;
+    list-style: none;
+    padding: 0px 10px;
+  
+    li {
+      font-size: 20px;
+      line-height: 22px;
+      
+      a {
+        text-decoration: none;
+      }
+    }
+  }
+  .js_lobby_full {
+    color: grey;
+  }
 }

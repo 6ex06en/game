@@ -1,7 +1,7 @@
-%h3 Welcome
+%h3 Welcome, #{current_user.name}
 = link_to("Create lobby", new_lobby_path, remote: true) unless has_lobby?
-- if has_lobby?
-  = render "shared/lobby"
 .lobbies__list
   %ul
-    = render(partial: "shared/lobbies_list", collection: @lobbies) || "No lobby"
+    = render(partial: "shared/lobbies_list", collection: @lobbies, as: :lobby) || "No lobby"
+- if has_lobby?
+  = render "shared/lobby"

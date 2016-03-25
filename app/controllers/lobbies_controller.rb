@@ -1,7 +1,8 @@
 class LobbiesController < ApplicationController
   before_action :signed_in?
   before_action ->(options = :unneeded){with_lobby?(options)}, only: [:new, :create]
-  before_action :with_lobby?, except: [:new, :create]
+  before_action :with_lobby?, except: [:new, :create, :join]
+  before_action :owner_lobby?, only: [:join]
 
   def new
     @lobby = current_user.build_lobby
@@ -11,7 +12,7 @@ class LobbiesController < ApplicationController
   end
 
   def create
-    lobby = current_user.build_lobby(lobby_params)
+    lobby = current_user.build_lobby(lobby_params(:create))
     if lobby.save
       redirect_to root_path, notice: "lobby created!"
     else
@@ -28,7 +29,14 @@ class LobbiesController < ApplicationController
     redirect_to root_path
   end
 
-  def update
+  def join
+    lobby = Lobby.find_by(params[:id])
+    if lobby
+      lobby.update_attributes(guest_id: params[:guest_id]) 
+      redirect_to root_path
+    else
+      render "main/index"
+    end
   end
 
   private
@@ -41,8 +49,16 @@ class LobbiesController < ApplicationController
     end
   end
 
-  def lobby_params
-    params.require(:lobby).permit(:name)
+  def lobby_params(action)
+    case action
+      when :create then params.require(:lobby).permit(:name)
+      when :update then params.permit(:guest_id)
+    end
   end
+  
+  def owner_lobby?
+    redirect_to root_path if current_user.owner_lobby?
+  end
+  
 
 end

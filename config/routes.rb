@@ -1,7 +1,11 @@
 Rails.application.routes.draw do
   root "main#index"
 
-  resources :lobbies,  only: [:new, :create, :destroy, :update]
+  resources :lobbies,  only: [:new, :create, :destroy, :update] do
+    member do
+      put "join" => "lobbies#join", as: "join"
+    end
+  end
   resources :users,    only: [:new, :create, :destroy]
   resources :sessions, only: [:new, :create, :destroy]
 

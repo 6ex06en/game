@@ -1,8 +1,8 @@
 .lobby
   .lobby_player
-    .lobby_player--first
+    .lobby_player--first{data: {creator_id: lobby.user.id}}
       = lobby.user.name
-    .lobby_player--second
+    .lobby_player--second{data: {guest_id: (lobby.guest ? lobby.guest.id : nil)}}
       = lobby.guest.try(:name)
   .lobby__field
     .lobby__name
@@ -16,5 +16,5 @@
       %li{data: {figure: "spok"}} Spok
   .lobby__history History
   .lobby__control-panel
-    = button_to("Start", '#', disabled: true)
+    = button_to("Start", '#', disabled: !lobby_full?(lobby)) if current_user.owner_lobby?
     = button_to("Leave lobby", lobby_path(lobby.id), method: :delete)

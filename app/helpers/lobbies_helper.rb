@@ -7,4 +7,9 @@ module LobbiesHelper
   def lobby
     current_user.lobby || current_user.guest_lobby
   end
+  
+  def lobby_full?(lobby)
+    lobby.guest.present?
+  end
+  
 end

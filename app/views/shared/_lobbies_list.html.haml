@@ -1,2 +1,2 @@
 %li
-  = lobby.name
+  = link_to lobby.name, join_lobby_path(lobby, guest_id: current_user.id), method: :put, data: {full: lobby_full?(lobby)}
