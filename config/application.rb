@@ -22,6 +22,6 @@ module Game
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
-    # config.eager_load_paths << "#{config.root}/app/hz/lib/*"
+    # config.autoload_paths << "#{config.root}/app/faye_websocket/lib/*"
   end
 end

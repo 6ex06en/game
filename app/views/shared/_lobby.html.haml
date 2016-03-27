@@ -16,5 +16,5 @@
       %li{data: {figure: "spok"}} Spok
   .lobby__history History
   .lobby__control-panel
-    = button_to("Start", '#', disabled: !lobby_full?(lobby)) if current_user.owner_lobby?
+    = button_to("Start", start_game_lobby_path(lobby), disabled: !lobby_full?(lobby), remote: true) if current_user.owner_lobby?
     = button_to("Leave lobby", lobby_path(lobby.id), method: :delete)

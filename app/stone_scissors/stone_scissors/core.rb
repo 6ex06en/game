@@ -1,4 +1,5 @@
 require "timeout"
+require "json"
 
 module StoneScissors
   class Core
@@ -10,7 +11,7 @@ module StoneScissors
       "spok" => :spok
     }
 
-    attr_reader :palyer1, :player2, :timer, :max_score
+    attr_reader :player1, :player2, :timer, :max_score
     attr_accessor :p1_score, :p2_score
 
     def initialize(creator, invited, timer = 10, max_score = 3)
@@ -19,32 +20,41 @@ module StoneScissors
       @p1_score = 0
       @p2_score = 0
       @timer = timer
-      # @current_plyer = nil
       @max_score = max_score
       wait_roll
     end
 
     def wait_roll
       Thread.new do
-        p "Strt_thread"
+        # p "Strt_thread"
         until best_score == max_score
           begin
-            p "#{best_score} - best_score"
-            #Timeout.timeout(timer) do
+            # p "#{best_score} - best_score"
+            Timeout.timeout(timer) do
               loop do
-                p "start_loop"
+                # p "start_loop"
                 sleep 1
                 [player1, player2].each do |p|
-                  send_hint(p); p.off_hint if p.hint
+                  if p.hint
+                    send_hint(p)
+                    p.off_hint
+                  end
                 end
-                break if player1.roll && player2.roll
+                # p "no hint"
+                if player1.roll && player2.roll
+                  puts("break loop")
+                  break
+                end
               end
-            #end
-          rescue Timeout::Error
+            end
+          # rescue Timeout::Error
+          rescue
             p "Trigger timeout"
-            p1_roll = player1.role.dup #игнорировать изменение переменных,
-            p2_roll = player2.role.dup #если присваивание произойдет после таймаута
-            time_expired(p1_roll, p2_roll)
+            #p1_roll = player1.role #игнорировать изменение переменных,
+            #p2_roll = player2.role #если присваивание произойдет после таймаута
+            player_rolls = [player1, player2].map{|p| p.roll ? p.roll.to_s.dup : nil}
+            p player_rolls
+            time_expired(*player_rolls)
           end
           handle_rolls result(player1.roll, player2.roll)
         end
@@ -55,15 +65,16 @@ module StoneScissors
     end
 
     def handle_rolls(result)
-      player1.roll == result ? @p1_score += 1 : @p2_score += 1
+      player1.roll == result ? self.p1_score += 1 : self.p2_score += 1
 
       message = {
+        "type" => "game",
         "game" => "win",
         "win_figure" => result,
         "#{player1.id}" => {"figure" => player1.roll, "score" => p1_score},
         "#{player2.id}" => {"figure" => player2.roll, "score" => p2_score}
-      }
-      clean_figure
+      }.to_json
+      reset_rolls
       send_message(message)
     end
 
@@ -71,14 +82,15 @@ module StoneScissors
       if p1_roll && p2_roll
         handle_rolls result(p1.roll, p2.roll)
       else
-        p1_score += 1 if p1_roll
-        p2_score += 1 if p2_roll
+        self.p1_score += 1 if p1_roll
+        self.p2_score += 1 if p2_roll
         message = {
+          "type" => "game",
           "game" => "timeout",
-          "#{player1.id}" => {"score" => p1_score, "figure" => p1_roll},
-          "#{player2.id}" => {"score" => p2_score, "figure" => p2_roll}
-        }
-        clean_figure
+          "creator" => {"score" => p1_score, "figure" => p1_roll},
+          "guest" => {"score" => p2_score, "figure" => p2_roll}
+        }.to_json
+        reset_rolls
         send_message(message)
       end
     end
@@ -102,10 +114,11 @@ module StoneScissors
       competitor = player == player1 ? player2 : player1
       hint = Game::Figures.values - [competitor.roll] if competitor.roll
       message = {
+        "type" => "game",
         "game" => "hint",
-        "player" => player.id,
+        "player" => (player == player1 ? "creator" : "guest"),
         "figure" => (hint ? [hint.sample, competitor.roll].shuffle : ["none"])
-      }
+      }.to_json
       Connection.find_by_player_id(player.id).ws.send(message)
     end
 
@@ -113,11 +126,16 @@ module StoneScissors
       p1_score > p2_score ? p1_score : p2_score
     end
 
-    def clean_figure
-      [player1, player2].each{|p| p.clean_figure}
+    def reset_rolls
+      begin
+        [player1, player2].each{|p| p.clean_figure}
+      rescue => e
+        raise e
+      end
     end
 
     def send_message(data)
+      p "send message"
       [player1, player2].each{|p| p.ws.send(data)}
     end
   end

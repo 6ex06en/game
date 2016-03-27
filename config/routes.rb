@@ -3,13 +3,15 @@ Rails.application.routes.draw do
 
   resources :lobbies,  only: [:new, :create, :destroy, :update] do
     member do
-      put "join" => "lobbies#join", as: "join"
+      put "join"       => "lobbies#join"
+      post "start_game" => "lobbies#start_game"
     end
   end
   resources :users,    only: [:new, :create, :destroy]
   resources :sessions, only: [:new, :create, :destroy]
 
   get 'main/index'
+  get 'ws' => "main#ws", as: :ws
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

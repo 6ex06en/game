@@ -30,7 +30,7 @@ gem 'faye-websocket'
 gem 'rspec'
 gem 'rspec-rails'
 gem 'factory_girl_rails'
-
+gem 'puma'
 # Use Unicorn as the app server
 # gem 'unicorn'
 

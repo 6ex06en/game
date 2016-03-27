@@ -1,11 +1,12 @@
 module StoneScissors
   class Player
 
-    attr_reader :roll, :hint, :object 
+    attr_reader :roll, :hint, :object, :ws
 
-    def initialize(object)
+    def initialize(ws, object)
       @hint = false
       @object = object
+      @ws = ws
     end
 
     def choose_figure!(figure)
@@ -15,9 +16,13 @@ module StoneScissors
     def id
       object.id
     end
-    
+
+    def clean_figure
+      @roll = nil
+    end
+
     protected
-    
+
     def hint!
       @hint = true
     end
@@ -26,9 +31,6 @@ module StoneScissors
       @hint = false
     end
 
-    def clean_figure
-      @figure = nil
-    end
 
   end
 end
