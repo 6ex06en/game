@@ -2,8 +2,8 @@ class WS
   constructor: ->
     protocol = if window.location.protocol.slice(-2) == "s" then "wss" else "ws"
     host = window.location.host
-
     @url = "#{protocol}://#{host}/ws"
+    @eventController = new EventController()
 
     @setConnection()
 
@@ -16,8 +16,10 @@ class WS
   onMessage: (data) ->
     # console.log(data.data)
     # console.log(typeof data.data)
-    object = JSON.parse(data.data)
-    console.log(object)
+    event_data = JSON.parse(data.data)
+    console.log(event_data)
+    @submitEvent(event_data)
+
   onError: (data) ->
     console.log(data)
 
@@ -25,16 +27,32 @@ class WS
     json = JSON.stringify(data)
     @ws.send(json)
 
-#
-# class EventController
-#
-#   constructor: ->
-#     @eventList = []
-#
-#   addEvent: (event, elem) ->
-#
-#   getEventList: ->
-#     @eventList
+  submitEvent: (data)->
+    @eventController.reciveEvent(data)
+
+
+class EventController
+
+  constructor: ->
+    @handlers = {notify: new Page(), game: new Game()}
+
+  getPage: ->
+    @handlers.notify
+
+  getGame: ->
+    @handlers.game
+
+  setGameParams: (player1, player2, timer, maxScore)->
+    options =
+      player1: player1,
+      player2: player2,
+      timer: timer,
+      maxScore: maxScore
+    @getGame().setParams(options)
+
+  reciveEvent: (event_data)->
+    event_type = event_data.type
+    @handlers[event_type].reciveEvent(event_data)
 
 $(document).on "update_status", ->
   $(".lobbies__list a").each (e) ->
@@ -49,28 +67,33 @@ $(document).on "update_status", ->
 $(document).ready ->
   $(@).trigger("update_status")
 
+class Page
+  constructor: ->
+  recieveEvent: ->
+
 class Game
 
-  constructor: (player1_id, player2_id, timer) ->
+  constructor: (player1_id, player2_id, timer, maxScore) ->
+    @options =
+      player1: player1_id,
+      player2: player2_id,
+      timer: timer || 5,
+      maxScore: maxScore || 3
     @state = "stop"
-    @player1 = player1_id
-    @player2 = player2_id
-    @timer = timer
 
   getPlyer1: ->
-    @player1
-
+    @options.player1
   getPlyer2: ->
-    @player2
-
+    @options.player2
   getState: ->
     @state
-
   getTimer: ->
-    @timer
-
+    @options.timer
   setState: (state) ->
     @state = state
+  setParams: (options)->
+    $.extend(true, @options, options)
+  recieveEvent: (event)->
 
   changeState: =>
     @setState(new StartState(@)).handle() if @state = "stop"
@@ -79,7 +102,6 @@ class GameState
     constructor: (game, event) ->
       @game = game
       @event = event
-
     getGame: ->
       @game
 
@@ -152,5 +174,6 @@ class RunState extends GameState
 
 window.WS = new WS()
 window.Game = Game
+window.Page = Page
 window.StopState = StopState
 window.StartState = StartState
