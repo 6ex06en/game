@@ -1,6 +1,6 @@
 class WS
   constructor: ->
-    protocol = if window.location.protocol.slice(-2) == "s" then "wss" else "ws"
+    protocol = if window.location.protocol.slice(-2, -1) == "s" then "wss" else "ws"
     host = window.location.host
     @url = "#{protocol}://#{host}/ws"
     @eventController = new EventController()

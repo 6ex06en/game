@@ -23,6 +23,7 @@ class User < ActiveRecord::Base
 
   def leave_lobby
     guest_lobby.update_attributes(guest_id: nil) if guest_lobby
+    lobby.destroy if lobby
   end
 
   def owner_lobby?
