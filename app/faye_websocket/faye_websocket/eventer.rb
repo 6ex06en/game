@@ -22,7 +22,6 @@ module FayeWebsocket
       ws.on :close do |event|
         Thread.new do
           con = Connection.connected.find{|c| c.ws == ws}
-          puts "Finded connection user - #{con.user.name}"
           delay = 15.second.from_now
           loop {break if Time.now > delay}
           con.user.leave_lobby unless Connection.find_by_user_id(con.user.id)

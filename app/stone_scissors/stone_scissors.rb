@@ -15,7 +15,7 @@ module StoneScissors
       p2 = Player.new connection2.ws, connection2.user
       # p "start_game"
       Core.new(p1, p2, timer, max_score)
-      FayeWebsocket::Connection.notify({game: "run_game"}, [p1.id, p2.id])
+      # FayeWebsocket::Connection.notify({game: "run_game"}, [p1.id, p2.id])
       # con1 = Connection.find_by_user_id(object1_id)
       # con2 = Connection.find_by_user_id(object2_id)
       # if con1 && con2

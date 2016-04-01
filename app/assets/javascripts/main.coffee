@@ -13,7 +13,7 @@ class WS
     @ws.onmessage = @onMessage
     @ws.onerror = @onError
 
-  onMessage: (data) ->
+  onMessage: (data) =>
     # console.log(data.data)
     # console.log(typeof data.data)
     event_data = JSON.parse(data.data)
@@ -52,7 +52,7 @@ class EventController
 
   reciveEvent: (event_data)->
     event_type = event_data.type
-    @handlers[event_type].reciveEvent(event_data)
+    @handlers[event_type].recieveEvent(event_data)
 
 $(document).on "update_status", ->
   $(".lobbies__list a").each (e) ->
@@ -94,6 +94,7 @@ class Game
   setParams: (options)->
     $.extend(true, @options, options)
   recieveEvent: (event)->
+    @changeState() if event.game == "run_game"
 
   changeState: =>
     @setState(new StartState(@)).handle() if @state = "stop"
@@ -160,7 +161,7 @@ class RunState extends GameState
         $("<li/>", {class: "selected", text: clickedFigure}).appendTo(figures_list)
 
     stopWaitingRoll: ->
-      $(".lobby__figures li").off("click")
+      $(".lobby__figures").off("click")
       selected = $(".lobby__figures li.selected")
       selected.remove() if selected
       # @showElem(".lobby__figures li")

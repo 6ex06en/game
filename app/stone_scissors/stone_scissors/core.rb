@@ -21,6 +21,7 @@ module StoneScissors
       @p2_score = 0
       @timer = timer
       @max_score = max_score
+      send_message({type: "game", game: "run_game"}.to_json)
       wait_roll
     end
 
