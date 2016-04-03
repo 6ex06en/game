@@ -2,6 +2,7 @@ module StoneScissors
   class Player
 
     attr_reader :roll, :hint, :object, :ws
+    attr_accessor :game
 
     def initialize(ws, object)
       @hint = false
@@ -11,6 +12,7 @@ module StoneScissors
 
     def choose_figure!(figure)
       @roll = Core::Figures[figure]
+      moved_piace
     end
 
     def id
@@ -21,9 +23,17 @@ module StoneScissors
       @roll = nil
     end
 
+    def competitor
+      game.player1 == self ? game.player2 : game.player1 if game
+    end
+
     protected
 
-    def hint!
+    def moved_piace #сделан ход
+      @game.resume_game if competitor.roll
+    end
+
+    def use_hint!
       @hint = true
     end
 

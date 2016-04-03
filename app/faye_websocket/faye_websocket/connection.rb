@@ -14,7 +14,13 @@ module FayeWebsocket
       end
 
       def new(ws, user)
-        super unless find_by_user_id(user.id)
+        connection = find_by_user_id(user.id)
+        p "connection - #{connection}"
+        if connection
+          connection.ws = ws
+        else
+          super
+        end
       end
 
       def notify(data, users_id)
@@ -24,7 +30,7 @@ module FayeWebsocket
       end
     end
 
-    attr_reader :ws, :user
+    attr_accessor :ws, :user
 
     def initialize(ws, user)
       @ws = ws

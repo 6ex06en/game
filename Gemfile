@@ -31,6 +31,7 @@ gem 'rspec'
 gem 'rspec-rails'
 gem 'factory_girl_rails'
 gem 'puma'
+
 # Use Unicorn as the app server
 # gem 'unicorn'
 
@@ -46,4 +47,10 @@ group :development, :test do
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
+  #My
+  gem "better_errors"
+  gem "binding_of_caller"
+  gem 'meta_request'
+  # gem 'flamegraph'
+  # gem 'rack-mini-profiler'
 end

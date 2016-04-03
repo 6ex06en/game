@@ -6,6 +6,7 @@ module FayeWebsocket
     def self.handle(ws, user)
 
       ws.on :open do |event|
+        p "#{Thread.list.length}  - ws open"
         p "#{event.type} - #{object_id}"
         Connection.new(ws, user)
         p "count_connections: #{Connection.connected.length}"
@@ -14,17 +15,21 @@ module FayeWebsocket
       ws.on :message do |event|
         p "#{event.type} - #{object_id}"
         hash = JSON.parse(event.data)
-        p hash
-        p Connection.connected.count
         Connection.notify(hash.to_json)
       end
 
       ws.on :close do |event|
         Thread.new do
           con = Connection.connected.find{|c| c.ws == ws}
-          delay = 15.second.from_now
-          loop {break if Time.now > delay}
-          con.user.leave_lobby unless Connection.find_by_user_id(con.user.id)
+          if con
+            # delay = 15.second.from_now
+            # loop {break if Time.now > delay}
+            sleep 15
+            con.user.leave_lobby unless Connection.find_by_user_id(con.user.id)
+            con = nil
+          else
+            Thread.current.kill
+          end
         end
       end
 

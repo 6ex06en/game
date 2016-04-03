@@ -9,6 +9,7 @@ class LobbiesController < ApplicationController
     @lobby = current_user.build_lobby
     respond_to do |format|
       format.js
+      format.html
     end
   end
 
@@ -46,7 +47,7 @@ class LobbiesController < ApplicationController
       current_user_ws = FayeWebsocket::Connection.find_by_user_id(current_user.id)
       guest_ws = FayeWebsocket::Connection.find_by_user_id(lobby.guest.id)
       p "#{current_user_ws.try(:user)} - current_user_ws, #{guest_ws.try(:user)} - guest_ws"
-      StoneScissors.new_game(current_user_ws, guest_ws, 3)
+      StoneScissors.new_game(current_user_ws, guest_ws, 15)
     end
     head :ok
   end

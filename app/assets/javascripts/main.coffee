@@ -113,6 +113,7 @@ class StopState extends GameState
 
     handle: ->
       console.log("Current_state - Stop")
+      @getGame.setState = "stop"
 
 class StartState extends GameState
 
@@ -155,7 +156,7 @@ class RunState extends GameState
     waitRoll: ->
       figures_list = $(".lobby__figures")
       _this = @
-      figures_list.on "click", "li", (e)->
+      figures_list.on "click", "li[data-figure]", (e)->
         clickedFigure = $(@).data("figure")
         _this.hideElem(".lobby__figures li")
         $("<li/>", {class: "selected", text: clickedFigure}).appendTo(figures_list)
@@ -164,7 +165,7 @@ class RunState extends GameState
       $(".lobby__figures").off("click")
       selected = $(".lobby__figures li.selected")
       selected.remove() if selected
-      # @showElem(".lobby__figures li")
+      @showElem(".lobby__figures li")
 
 
     hideElem: (elem)->

@@ -10,6 +10,7 @@ class MainController < ApplicationController
     if Faye::WebSocket.websocket?(request.env) && current_user
       ws = Faye::WebSocket.new(request.env, nil, {ping: KEEPALIVE_TIME})
       FayeWebsocket.accept(ws, current_user)
+      # render :nothing
       head :ok
     else
       redirect_to root_path
