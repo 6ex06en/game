@@ -15,7 +15,7 @@ module FayeWebsocket
       ws.on :message do |event|
         p "#{event.type} - #{object_id}"
         hash = JSON.parse(event.data)
-        Connection.notify(hash.to_json)
+        MessageHandler.handle_message(ws, hash)
       end
 
       ws.on :close do |event|

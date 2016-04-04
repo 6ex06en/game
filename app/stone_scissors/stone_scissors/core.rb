@@ -22,7 +22,6 @@ module StoneScissors
       @timer = timer
       @max_score = max_score
       @player1.game = @player2.game = self
-      # send_message({type: "game", game: "run_game"}.to_json)
       wait_roll
     end
 
@@ -65,13 +64,14 @@ module StoneScissors
     # end
 
     def wait_roll
+      # send_message({type: "game", game: "run_game"}.to_json)
       set_timer(time)
     end
 
     def set_timer(time)
       @timer = Thread.new do
         sleep time
-        check_status
+        time_expired
       end
     end
 
@@ -85,41 +85,72 @@ module StoneScissors
       @timer = nil
     end
 
-    def check_status
+    def resume_game
+      disable_timer if timer_running?
+      handle_rolls result(player1.roll, player2.roll)
     end
 
-    def score
+    # def check_status
+    # end
+    
+    # def score
+    # end
+    
+    def get_event(data)
+      case data['game']
+        when "roll"
+          player = (data['sender'].to_i == player1.id) ? player1 : player2
+          player.choose_figure! data['figure']
+      end
     end
 
     def handle_rolls(result)
-      player1.roll == result ? self.p1_score += 1 : self.p2_score += 1
-
-      message = {
-        "type" => "game",
-        "game" => "win",
-        "win_figure" => result,
-        "#{player1.id}" => {"figure" => player1.roll, "score" => p1_score},
-        "#{player2.id}" => {"figure" => player2.roll, "score" => p2_score}
-      }.to_json
-      reset_rolls
-      send_message(message)
+      message = ''
+      if player1.roll == player2.roll
+        message = build_message("drow")       
+      else
+        winner = if result == player1.roll 
+          p1_score += 1
+          player1
+        else
+          p2_score += 1
+          player2
+        end
+        message = build_message("finish_round", {"winner" => winner.id}) 
+        reset_rolls
+      end
+      # send_message(message)
     end
 
-    def time_expired(p1_roll, p2_roll)
-      if p1_roll && p2_roll
-        handle_rolls result(p1.roll, p2.roll)
+    def time_expired
+      if player1.roll && player2.roll
+        handle_rolls result(player1.roll, player2.rolll)
       else
-        self.p1_score += 1 if p1_roll
-        self.p2_score += 1 if p2_roll
-        message = {
-          "type" => "game",
-          "game" => "timeout",
-          "creator" => {"score" => p1_score, "figure" => p1_roll},
-          "guest" => {"score" => p2_score, "figure" => p2_roll}
-        }.to_json
+        self.p1_score += 1 if player1.roll
+        self.p2_score += 1 if player2.roll
+        message = build_message("timeout")
         reset_rolls
-        send_message(message)
+        # send_message(message)
       end
+    end
+    
+    def build_message(event, options = {})
+      message = {
+        "type"          => "game",
+        "game"          => "#{event.to_s}",
+        "#{player1.id}" => {"score" => p1_score}, 
+        "#{player2.id}" => {"score" => p2_score}
+      }
+      case event
+        when "timeout", "drow"
+          [player1.id, player2.id].each do |id|
+            player = (id == player1.id) ? player1 : player2
+            message[id].merge({"figure" => player.roll})
+          end
+        when "finish_round"
+          message.merge(options)
+      end
+      message   
     end
 
     def result(figures)
@@ -145,7 +176,7 @@ module StoneScissors
         "game" => "hint",
         "player" => (player == player1 ? "creator" : "guest"),
         "figure" => (hint ? [hint.sample, competitor.roll].shuffle : ["none"])
-      }.to_json
+      }
       Connection.find_by_player_id(player.id).ws.send(message)
     end
 
@@ -163,7 +194,7 @@ module StoneScissors
 
     def send_message(data)
       p "send message"
-      [player1, player2].each{|p| p.ws.send(data)}
+      [player1, player2].each{|p| p.ws.send(data.to_json)}
     end
   end
 end

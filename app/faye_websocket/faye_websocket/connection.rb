@@ -12,6 +12,10 @@ module FayeWebsocket
       def find_by_user_id(user_id)
         connected.find{|c| c.user.id == user_id}
       end
+      
+      def find_by_ws(ws)
+        connected.find{|c| c.ws == ws}
+      end
 
       def new(ws, user)
         connection = find_by_user_id(user.id)

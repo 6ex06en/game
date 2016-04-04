@@ -4,10 +4,10 @@ module StoneScissors
     attr_reader :roll, :hint, :object, :ws
     attr_accessor :game
 
-    def initialize(ws, object)
+    def initialize(connection)
       @hint = false
-      @object = object
-      @ws = ws
+      @object = connection.user
+      @ws = connection.ws
     end
 
     def choose_figure!(figure)
